@@ -75,7 +75,7 @@
         audio.play()
           .then(() => {
             audio.muted = false;
-            audio.volume = 0.5;
+            audio.volume = 0.25;
             console.log('Audio reproduciendo con volumen', audio.volume);
           })
           .catch(err => console.error('Error al reproducir audio:', err));
