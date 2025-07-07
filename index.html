@@ -42,10 +42,6 @@
       <button id="enter-btn">Entrar</button>
     </div>
   </div>
-  <audio id="bg-music" controls autoplay loop style="position:fixed;bottom:10px;right:10px;opacity:0.7;z-index:100;">
-    <source src="interestellar.mp3" type="audio/mpeg">
-    Tu navegador no soporta audio HTML5.
-  </audio>
   <div id="container">
     <div id="users-list"></div>
     <h1>Lista de Tareas</h1>
@@ -56,23 +52,95 @@
     <ul id="tasks"></ul>
   </div>
   <script>
-    document.addEventListener('DOMContentLoaded',()=>{const overlay=document.getElementById('login-overlay'),userInput=document.getElementById('username-input'),enterBtn=document.getElementById('enter-btn'),container=document.getElementById('container');enterBtn.addEventListener('click',()=>{const name=userInput.value.trim();if(!name)return;overlay.classList.add('hidden');container.classList.add('visible');initApp(name);} );userInput.addEventListener('keydown',e=>{if(e.key==='Enter')enterBtn.click();});});
+    let audio;
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const overlay = document.getElementById('login-overlay');
+      const userInput = document.getElementById('username-input');
+      const enterBtn = document.getElementById('enter-btn');
+      const container = document.getElementById('container');
+      enterBtn.addEventListener('click', ()=>{
+        const name = userInput.value.trim();
+        if (!name) return;
+        overlay.classList.add('hidden');
+        container.classList.add('visible');
+        // iniciar música tras interacción
+        audio = new Audio('interestellar.mp3');
+        audio.loop = true;
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+        initApp(name);
+      });
+      userInput.addEventListener('keydown', e => { if (e.key === 'Enter') enterBtn.click(); });
+    });
+
     function initApp(username){
-      const config={apiKey:"AIzaSyBHlnSTq2Lsc-6HZO3DsNgDkgXCUa9TNI0",authDomain:"to-do-incraft.firebaseapp.com",databaseURL:"https://to-do-incraft-default-rtdb.europe-west1.firebasedatabase.app",projectId:"to-do-incraft",storageBucket:"to-do-incraft.appspot.com",messagingSenderId:"885177846199",appId:"1:885177846199:web:e01baab55b97ba6c70c032"};
+      const config = {...};
       firebase.initializeApp(config);
-      const db=firebase.database().ref('tareas'),presence=firebase.database().ref('presence');
-      const userKey=presence.push().key,userRef=presence.child(userKey);
-      userRef.set({name:username});userRef.onDisconnect().remove();window.addEventListener('beforeunload',()=>userRef.remove());
-      const usersEl=document.getElementById('users-list');
-      presence.on('child_added',snap=>{const span=document.createElement('span');span.id='user-'+snap.key;span.className='user-badge';span.textContent=snap.val().name;usersEl.appendChild(span);} );
-      presence.on('child_removed',snap=>{const span=document.getElementById('user-'+snap.key);if(span)span.remove();});
-      const tasksEl=document.getElementById('tasks'),input=document.getElementById('task-input'),btn=document.getElementById('add-btn');
-      function addTask(text){db.push({texto:text,completa:false});input.value='';}
-      btn.addEventListener('click',()=>{if(input.value.trim())addTask(input.value.trim());});
-      input.addEventListener('keydown',e=>{if(e.key==='Enter'&&input.value.trim())addTask(input.value.trim());});
-      db.on('child_added',snap=>{const data=snap.val(),li=document.createElement('li');li.id='task-'+snap.key;if(data.completa)li.classList.add('completed');const cb=document.createElement('input');cb.type='checkbox';cb.checked=data.completa;cb.addEventListener('change',()=>{db.child(snap.key).update({completa:cb.checked});li.classList.toggle('completed',cb.checked);});li.appendChild(cb);const lbl=document.createElement('label');lbl.textContent=data.texto;li.appendChild(lbl);const del=document.createElement('button');del.className='delete-btn';del.innerHTML='🗑';del.addEventListener('click',()=>{db.child(snap.key).remove();li.classList.add('shred');});li.appendChild(del);tasksEl.appendChild(li);});
-      db.on('child_changed',snap=>{const li=document.getElementById('task-'+snap.key);if(!li)return;const d=snap.val();li.classList.toggle('completed',d.completa);li.querySelector('input').checked=d.completa;li.querySelector('label').textContent=d.texto;});
-      db.on('child_removed',snap=>{const li=document.getElementById('task-'+snap.key);if(li){li.classList.add('shred');setTimeout(()=>li.remove(),800);} });}
+      const db = firebase.database().ref('tareas');
+      const presence = firebase.database().ref('presence');
+      const userKey = presence.push().key;
+      const userRef = presence.child(userKey);
+      userRef.set({name:username});
+      userRef.onDisconnect().remove();
+      window.addEventListener('beforeunload', ()=>userRef.remove());
+      const usersEl = document.getElementById('users-list');
+      presence.on('child_added', snap=>{
+        const span = document.createElement('span');
+        span.id = 'user-'+snap.key;
+        span.className = 'user-badge';
+        span.textContent = snap.val().name;
+        usersEl.appendChild(span);
+      });
+      presence.on('child_removed', snap=>{
+        const span = document.getElementById('user-'+snap.key);
+        if (span) span.remove();
+      });
+      const tasksEl = document.getElementById('tasks');
+      const input = document.getElementById('task-input');
+      const btn = document.getElementById('add-btn');
+      function addTask(text){
+        db.push({texto:text,completa:false});
+        input.value = '';
+      }
+      btn.addEventListener('click', ()=>{ if (input.value.trim()) addTask(input.value.trim()); });
+      input.addEventListener('keydown', e=>{ if(e.key==='Enter'&&input.value.trim()) addTask(input.value.trim()); });
+      db.on('child_added', snap=>{
+        const data = snap.val();
+        const li = document.createElement('li');
+        li.id = 'task-'+snap.key;
+        if (data.completa) li.classList.add('completed');
+        const cb = document.createElement('input');
+        cb.type='checkbox'; cb.checked=data.completa;
+        cb.addEventListener('change', ()=>{
+          db.child(snap.key).update({completa:cb.checked});
+          li.classList.toggle('completed', cb.checked);
+        });
+        li.appendChild(cb);
+        const lbl = document.createElement('label');
+        lbl.textContent = data.texto;
+        li.appendChild(lbl);
+        const del = document.createElement('button');
+        del.className='delete-btn'; del.innerHTML='🗑';
+        del.addEventListener('click', ()=>{
+          db.child(snap.key).remove();
+          li.classList.add('shred');
+        });
+        li.appendChild(del);
+        tasksEl.appendChild(li);
+      });
+      db.on('child_changed', snap=>{
+        const li = document.getElementById('task-'+snap.key);
+        if (!li) return;
+        const d = snap.val();
+        li.classList.toggle('completed', d.completa);
+        li.querySelector('input').checked = d.completa;
+        li.querySelector('label').textContent = d.texto;
+      });
+      db.on('child_removed', snap=>{
+        const li = document.getElementById('task-'+snap.key);
+        if (li){ li.classList.add('shred'); setTimeout(()=>li.remove(),800); }
+      });
+    }
   </script>
 </body>
 </html>
