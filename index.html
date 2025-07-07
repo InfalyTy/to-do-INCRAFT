@@ -7,14 +7,61 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
-    :root { --bg-color:#f5f7fa;--card-bg:#fff;--primary-color:#4a90e2;--text-color:#333;--border-color:#e0e0e0;--success-color:#34a853;--badge-bg:#e0f7fa;--badge-border:#4dd0e1; }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Segoe UI',sans-serif;background:var(--bg-color);color:var(--text-color);height:100vh;overflow:hidden;display:flex;justify-content:center;align-items:center;}
-    #login-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:10;transition:top .6s ease;}
-    #login-overlay.hidden{top:-100%;}
-    .login-box{background:#fff;padding:2rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);text-align:center;}
-    .login-box input,.login-box button{width:100%;padding:.75rem;margin-top:1rem;border:1px solid var(--border-color);border-radius:4px;}
-    .login-box button{background:var(--primary-color);border:none;color:#fff;cursor:pointer;}
+    :root {
+      --bg-color: #f5f7fa;
+      --card-bg: #fff;
+      --primary-color: #4a90e2;
+      --text-color: #333;
+      --border-color: #e0e0e0;
+      --success-color: #34a853;
+      --badge-bg: #e0f7fa;
+      --badge-border: #4dd0e1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #login-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: top .6s ease;
+    }
+    #login-overlay.hidden { top: -100%; }
+    .login-box {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .login-box input, .login-box button {
+      width: 100%;
+      padding: .75rem;
+      margin-top: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    .login-box button {
+      background: var(--primary-color);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
     #container {
       opacity: 0;
       transform: translateY(50px);
@@ -26,23 +73,112 @@
       background: var(--card-bg);
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }:translateY(50px);transition:opacity .6s,transform .6s;max-width:500px;width:100%;padding:2rem;background:var(--card-bg);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-    #container.visible{opacity:1;transform:translateY(0);}
-    #users-list{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;}
-    .user-badge{background:var(--badge-bg);border:1px solid var(--badge-border);padding:.25rem .5rem;border-radius:12px;font-size:.85rem;}
-    h1{text-align:center;margin-bottom:1.5rem;color:var(--primary-color);}
-    .input-group{display:flex;gap:.5rem;margin-bottom:1rem;}
-    #task-input{flex:1;padding:.75rem;border:1px solid var(--border-color);border-radius:4px;}
-    #add-btn{background:var(--primary-color);border:none;color:#fff;padding:.75rem 1rem;border-radius:4px;cursor:pointer;}
-    ul{list-style:none;padding:0;margin-top:1rem;max-height:300px;overflow-y:auto;}
-    li{background:var(--bg-color);display:flex;align-items:center;padding:.75rem;border-radius:4px;margin-bottom:.75rem;border:1px solid var(--border-color);position:relative;transition:background .3s;}
-    li.completed{background:#e6f4ea;border-color:var(--success-color);}    
-    li input[type="checkbox"]{margin-right:1rem;transform:scale(1.2);cursor:pointer;transition:transform .2s;}
-    li input[type="checkbox"]:checked{transform:scale(1.4);}    
-    li label{flex:1;}
-    .delete-btn{background:none;border:none;color:#e74c3c;font-size:1.2rem;cursor:pointer;margin-left:.5rem;}
-    @keyframes shred {0%{opacity:1;transform:translateX(0) rotate(0deg);}50%{opacity:.7;transform:translateX(20px) rotate(20deg);}100%{opacity:0;transform:translateX(100px) rotate(60deg);}}
-    .shred {animation:shred .8s forwards;}
+    }
+    #container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #users-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1rem;
+    }
+    .user-badge {
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      padding: .25rem .5rem;
+      border-radius: 12px;
+      font-size: .85rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
+    }
+    .input-group {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: 1rem;
+    }
+    #task-input {
+      flex: 1;
+      padding: .75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    #add-btn {
+      background: var(--primary-color);
+      border: none;
+      color: #fff;
+      padding: .75rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    li {
+      background: var(--bg-color);
+      display: flex;
+      align-items: center;
+      padding: .75rem;
+      border-radius: 4px;
+      margin-bottom: .75rem;
+      border: 1px solid var(--border-color);
+      position: relative;
+      transition: background .3s;
+    }
+    li.completed {
+      background: #e6f4ea;
+      border-color: var(--success-color);
+    }
+    li input[type="checkbox"] {
+      margin-right: 1rem;
+      transform: scale(1.2);
+      cursor: pointer;
+      transition: transform .2s;
+    }
+    li input[type="checkbox"]:checked {
+      transform: scale(1.4);
+    }
+    li label { flex: 1; }
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-left: .5rem;
+    }
+    @keyframes shred {
+      0% { opacity:1; transform: translateX(0) rotate(0deg); }
+      50% { opacity:.7; transform: translateX(20px) rotate(20deg); }
+      100% { opacity:0; transform: translateX(100px) rotate(60deg); }
+    }
+    .shred { animation: shred .8s forwards; }
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .4s, transform .4s;
+      z-index: 100;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -74,37 +210,25 @@
         if (!name) return;
         overlay.classList.add('hidden');
         container.classList.add('visible');
-                // Reproducción de música de fondo
-        // Asegúrate de que el nombre del archivo coincida exactamente, incluyendo mayúsculas/minúsculas
-        // Ajustar nombre al archivo real en el repo (verifica mayúsculas/minúsculas)
-        const audioPath = 'interstellar.mp3'; // o 'interstellar.mp3' si tu archivo se llama así
+        // Reproducción de música de fondo
+        const audioPath = 'interestellar.mp3';
         console.log('Audio path:', audioPath);
         audio = new Audio(audioPath);
         audio.loop = true;
-        // Políticas de autoplay: iniciar en silencio y luego habilitar sonido
         audio.muted = true;
         audio.play()
           .then(() => {
             audio.muted = false;
             audio.volume = 0.25;
             console.log('Audio reproduciendo con volumen', audio.volume);
-            // Mostrar notificación emergente
             const toast = document.createElement('div');
-            toast.className = 'toast';
+            toast.className = 'toast visible';
             toast.textContent = 'Reproduciendo Interstellar Stay';
             document.body.appendChild(toast);
             setTimeout(() => {
-              toast.classList.add('visible');
-            }, 100); // pequeño retraso para animación
-            setTimeout(() => {
               toast.classList.remove('visible');
               setTimeout(() => toast.remove(), 500);
-            }, 4100);
-          })
-          .then(() => {
-            audio.muted = false;
-            audio.volume = 0.25;
-            console.log('Audio reproduciendo con volumen', audio.volume);
+            }, 4000);
           })
           .catch(err => console.error('Error al reproducir audio:', err));
         initApp(name);
