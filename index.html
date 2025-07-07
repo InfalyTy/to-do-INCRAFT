@@ -63,12 +63,14 @@
         if (!name) return;
         overlay.classList.add('hidden');
         container.classList.add('visible');
-        // Usar ruta relativa directamente
-        const audioPath = 'interestellar.mp3';
-        console.log('Audio relative path:', audioPath);
+                // Reproducción de música de fondo
+        // Asegúrate de que el nombre del archivo coincida exactamente, incluyendo mayúsculas/minúsculas
+        // Ajustar nombre al archivo real en el repo (verifica mayúsculas/minúsculas)
+        const audioPath = 'interstellar.mp3'; // o 'interstellar.mp3' si tu archivo se llama así
+        console.log('Audio path:', audioPath);
         audio = new Audio(audioPath);
         audio.loop = true;
-        // Autoplay policies: iniciar en silencio y luego desmutear
+        // Políticas de autoplay: iniciar en silencio y luego habilitar sonido
         audio.muted = true;
         audio.play()
           .then(() => {
@@ -77,9 +79,6 @@
             console.log('Audio reproduciendo con volumen', audio.volume);
           })
           .catch(err => console.error('Error al reproducir audio:', err));
-        audio.loop = true;
-        audio.volume = 0.5;
-        audio.play().catch(() => {});
         initApp(name);
       });
       userInput.addEventListener('keydown', e => { if (e.key === 'Enter') enterBtn.click(); });
